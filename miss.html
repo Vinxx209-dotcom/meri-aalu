@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Miss You — Animated</title>
+  <style>
+    :root{--bg:#0f1724;--accent1:#ff6b81;--accent2:#ffb86b}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background: radial-gradient(circle at 10% 10%, rgba(255,107,129,0.06), transparent 10%),
+                  radial-gradient(circle at 90% 90%, rgba(255,184,107,0.04), transparent 10%),
+                  var(--bg);
+      color:#e6eef8;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:2rem;
+    }
+    .card{
+      width:min(900px,96%);
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+      border-radius:20px;
+      padding:3rem;
+      box-shadow:0 8px 30px rgba(2,6,23,0.6);
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+      opacity:0;
+      animation:fadeIn 3s ease forwards;
+    }
+    @keyframes fadeIn{
+      from{opacity:0;transform:scale(0.98)}
+      to{opacity:1;transform:scale(1)}
+    }
+    .heading{
+      font-size:clamp(36px,6vw,72px);
+      letter-spacing:0.02em;
+      font-weight:700;
+      margin:0;
+      display:inline-flex;
+      align-items:center;
+      gap:0.8rem;
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      opacity:0;
+      animation:fadeText 4s ease forwards 1s;
+    }
+    @keyframes fadeText{
+      from{opacity:0;}
+      to{opacity:1;}
+    }
+    .heart{
+      width:1.1em;height:1.1em;display:inline-block;transform-origin:center;animation:heartbeat 1s ease-in-out infinite;
+      filter:drop-shadow(0 6px 12px rgba(255,107,129,0.12));
+    }
+    @keyframes heartbeat{
+      0%{transform:scale(1)}
+      25%{transform:scale(1.18)}
+      40%{transform:scale(0.95)}
+      60%{transform:scale(1.08)}
+      100%{transform:scale(1)}
+    }
+    .sub{
+      margin-top:1rem;
+      font-size:clamp(16px,2.2vw,20px);
+      color:rgba(230,238,248,0.85);
+      opacity:0;
+      animation:fadeText 3s ease forwards 2.5s;
+    }
+    /* typewriter effect */
+    .typewrap{margin-top:1.6rem;height:2.2rem;display:flex;align-items:center;justify-content:center;opacity:0;animation:fadeText 3s ease forwards 4s;}
+    .type{
+      font-family: "Courier New", Courier, monospace;
+      font-size:1.1rem;
+      color:#fff;
+      white-space:nowrap;overflow:hidden;border-right:2px solid rgba(255,255,255,0.12);
+      width:0; /* animated by JS */
+    }
+    /* glowing floating petals */
+    .petal{position:absolute;width:14px;height:14px;border-radius:50%;opacity:0.85;filter:blur(6px)}
+    /* CTA */
+    .btn{
+      margin-top:2rem;
+      display:inline-block;padding:0.8rem 1.2rem;border-radius:999px;border:0;cursor:pointer;
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#061226;font-weight:700;
+      box-shadow:0 8px 20px rgba(255,107,129,0.12);
+      opacity:0;
+      animation:fadeText 3s ease forwards 6s;
+    }
+    /* responsive spacing */
+    @media (max-width:520px){.card{padding:2rem}}
+  </style>
+</head>
+<body>
+  <section class="card" aria-label="Miss you card">
+    <h1 class="heading">Miss You
+      <svg class="heart" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="url(#g)" d="M12 21s-7.5-4.5-10-7.2C-0.1 10.1 2.2 6 6 6c1.9 0 3.3 1.2 4 2 0.7-0.8 2.1-2 4-2 3.8 0 6.1 4.1 4 7.8C19.5 16.5 12 21 12 21z"/>
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0%" stop-color="#ff6b81"/>
+            <stop offset="100%" stop-color="#ffb86b"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </h1>
+
+    <p class="sub">A little something to let you know you're on my mind.</p>
+
+    <div class="typewrap" aria-hidden="true">
+      <div id="typed" class="type">Thinking of you... come back soon ✨</div>
+    </div>
+
+    <button class="btn" id="replay">Replay effect</button>
+
+    <!-- floating petals container (JS will spawn) -->
+
+  </section>
+
+  <script>
+    // Typewriter reveal using width animation
+    const typed = document.getElementById('typed');
+    const text = typed.textContent;
+    typed.textContent = '';
+
+    function typewriter(el, str, speed=40){
+      el.style.width = '0';
+      el.style.transition = 'none';
+      let i=0;
+      const step = ()=>{
+        i++;
+        el.textContent = str.slice(0,i);
+        const currentMeas = el.getBoundingClientRect().width;
+        el.style.width = currentMeas + 'px';
+        if(i<str.length) setTimeout(step, speed + Math.random()*40);
+        else el.style.borderRight='0';
+      }
+      el.style.borderRight = '2px solid rgba(255,255,255,0.12)';
+      step();
+    }
+
+    // Petal/confetti generator
+    function spawnPetal(){
+      const petal = document.createElement('div');
+      petal.className = 'petal';
+      const size = 8 + Math.random()*26;
+      petal.style.width = size+'px';
+      petal.style.height = (size*0.9)+'px';
+      petal.style.left = (10 + Math.random()*80) + '%';
+      const colors = ['#ff6b81','#ffb86b','#ffd6e0','#ff9fb3'];
+      petal.style.background = colors[Math.floor(Math.random()*colors.length)];
+      petal.style.top = '-6%';
+      petal.style.opacity = 0.9 - Math.random()*0.5;
+      petal.style.transform = 'rotate('+(Math.random()*360)+'deg)';
+      document.querySelector('.card').appendChild(petal);
+
+      const duration = 3800 + Math.random()*2600;
+      petal.animate([
+        {transform: petal.style.transform + ' translateY(0) translateX(0)', opacity: petal.style.opacity},
+        {transform: 'rotate('+ (Math.random()*720-360) +'deg) translateY(110vh) translateX('+ (Math.random()*120-60) +'px)', opacity:0.08}
+      ], {duration, easing:'cubic-bezier(.2,.8,.2,1)'});
+
+      setTimeout(()=>petal.remove(), duration+50);
+    }
+
+    function playAll(){
+      // restart typewriter
+      typewriter(typed, text, 40);
+      // spawn a few petals
+      for(let i=0;i<12;i++) setTimeout(spawnPetal, i*180 + Math.random()*600);
+      // give an extra burst
+      setTimeout(()=>{for(let i=0;i<8;i++) setTimeout(spawnPetal, i*80)}, 700);
+    }
+
+    document.getElementById('replay').addEventListener('click', playAll);
+
+    // autoplay on load
+    window.addEventListener('load', ()=>{setTimeout(playAll, 360)});
+
+  </script>
+</body>
+</html>
